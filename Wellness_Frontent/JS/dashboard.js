@@ -72,7 +72,7 @@ document
             ) {
 
                 window.location.href =
-                    "mood-journal.html";
+                    "Mood.html";
 
                 return;
 
