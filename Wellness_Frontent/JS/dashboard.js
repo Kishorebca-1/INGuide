@@ -72,7 +72,7 @@ document
             ) {
 
                 window.location.href =
-                    "Mood.html";
+                    "../Mood & Journal/Mood.html";
 
                 return;
 
@@ -260,7 +260,7 @@ document
     .getElementById("sleepCheckin")
     .addEventListener("click", () => {
 
-        window.location.href = "mood-journal.html";
+        window.location.href = "../Mood & Journal/Mood.html";
 
     });
 
