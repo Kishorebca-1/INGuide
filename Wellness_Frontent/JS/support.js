@@ -109,6 +109,8 @@ const communityBtn =
 const helplineBtn =
     document.getElementById("helplineBtn");
 
+let currentConversationId = null;
+
 
 /* ============================================
    TOAST NOTIFICATION
@@ -349,8 +351,17 @@ async function sendMessage() {
 
     try {
 
+        if (!currentConversationId) {
+            const conversationResponse = await wellnessApiRequest(
+                "/chat/conversations",
+                { method: "POST" }
+            );
+
+            currentConversationId = conversationResponse.conversation.id;
+        }
+
         const response = await fetch(
-            "http://localhost:5000/api/chat/message",
+            `http://localhost:5000/api/chat/conversations/${currentConversationId}/messages`,
             {
                 method: "POST",
 
@@ -381,7 +392,7 @@ async function sendMessage() {
 
         // Display Groq AI response
         addBotMessage(
-            data.data.assistantMessage
+            data.data.assistantMessage.message
         );
 
     } catch (error) {

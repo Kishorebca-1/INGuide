@@ -1128,17 +1128,28 @@ function setupSubmitRequest() {
             submitButton.textContent = "Submitting...";
 
             try {
-                const savedRequest = await wellnessApiRequest("/support/requests", {
+                const savedRequest = await wellnessApiRequest("/support", {
                     method: "POST",
-                    body: JSON.stringify(supportRequest)
+                    body: JSON.stringify({
+                        subject: `Professional support: ${supportRequest.supportType || "General support"}`,
+                        description: [
+                            `Professional: ${supportRequest.professional}`,
+                            `Method: ${supportRequest.supportMethod || "Not selected"}`,
+                            `Date: ${supportRequest.date || "Not selected"}`,
+                            `Time: ${supportRequest.time || "Not selected"}`,
+                            `Details: ${supportRequest.description || "No additional details provided."}`
+                        ].join("\n"),
+                        category: "wellness",
+                        priority: "normal"
+                    })
                 });
 
                 localStorage.setItem(
                     "latestSupportRequest",
                     JSON.stringify({
                         ...supportRequest,
-                        requestId: savedRequest.id,
-                        submittedAt: savedRequest.submittedAt
+                        requestId: `REQ-${savedRequest.id}`,
+                        submittedAt: savedRequest.created_at || supportRequest.submittedAt
                     })
                 );
             } catch (error) {
