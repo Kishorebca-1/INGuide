@@ -310,8 +310,14 @@ async function sendMessage() {
     if (!chatInput || !chatBody) return;
 
     const message = chatInput.value.trim();
+    const token = localStorage.getItem("token");
 
     if (message === "") {
+        return;
+    }
+
+    if (!token) {
+        addBotMessage("Please sign in before chatting with the Wellness Assistant.");
         return;
     }
 
@@ -350,6 +356,7 @@ async function sendMessage() {
 
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
                 },
 
                 body: JSON.stringify({
@@ -386,8 +393,14 @@ async function sendMessage() {
 
         typingElement.remove();
 
+        const errorMessage =
+            error.message === "Authorization token is required" ||
+            error.message === "Invalid or expired token"
+                ? "Your session has expired. Please sign in again before chatting."
+                : "Sorry, I couldn't connect to the Wellness Assistant. Please try again.";
+
         addBotMessage(
-            "Sorry, I couldn't connect to the Wellness Assistant. Please try again."
+            errorMessage
         );
 
     } finally {
