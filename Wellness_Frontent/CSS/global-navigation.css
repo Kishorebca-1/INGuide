@@ -1,0 +1,134 @@
+:root {
+    --global-sidebar: 248px;
+    --global-ink: #25233d;
+    --global-muted: #77758b;
+    --global-purple: #6840d7;
+    --global-surface: #ffffff;
+}
+
+.sidebar,
+.dashboard-container .sidebar {
+    width: var(--global-sidebar);
+    min-width: var(--global-sidebar);
+    background: var(--global-surface);
+    color: var(--global-ink);
+}
+
+.brand,
+.logo-section {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand h2,
+.logo-section h2 {
+    color: var(--global-ink);
+    margin: 0;
+}
+
+.brand p,
+.logo-section p,
+.logo-section span {
+    color: var(--global-muted);
+}
+
+.side-nav,
+.sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.nav-item,
+.sidebar-menu .nav-item {
+    min-height: 48px;
+    border-radius: 12px;
+    color: var(--global-muted);
+    font: inherit;
+    text-decoration: none;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+.nav-item:hover,
+.sidebar-menu .nav-item:hover,
+.nav-item.active,
+.sidebar-menu .nav-item.active {
+    background: #f0eaff;
+    color: var(--global-purple);
+}
+
+.topbar,
+.top-header {
+    min-height: 76px;
+}
+
+.top-actions,
+.header-right,
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.notification-btn,
+.notification-button,
+.profile-btn,
+.profile-button,
+.profile {
+    color: var(--global-ink);
+}
+
+.notification-btn,
+.notification-button {
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 12px;
+    background: #f6f3ff;
+    cursor: pointer;
+}
+
+.notification-btn:hover,
+.notification-button:hover,
+.profile-btn:hover,
+.profile-button:hover {
+    background: #eee9ff;
+}
+
+.profile-btn,
+.profile-button {
+    min-height: 42px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.profile-btn .avatar,
+.profile-button .avatar,
+.profile-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #eee9ff;
+}
+
+@media (max-width: 760px) {
+    :root { --global-sidebar: 100%; }
+
+    .sidebar,
+    .dashboard-container .sidebar {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .side-nav,
+    .sidebar-menu {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

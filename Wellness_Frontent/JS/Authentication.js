@@ -142,7 +142,7 @@ if (loginForm && emailInput && passwordInput) {
         if (String(user.role).toLowerCase() === "admin") {
           window.location.href = "../admin-dashboard.html";
         } else {
-          window.location.href = "../dashboard.html";
+          window.location.href = "../Dashboard/dashboard.html";
         }
       }, 800);
     } catch (error) {
@@ -515,7 +515,7 @@ async function handleGoogleCredential(googleResponse) {
       window.location.href =
         String(user.role).toLowerCase() === "admin"
           ? "../admin-dashboard.html"
-          : "../dashboard.html";
+          : "../Dashboard/dashboard.html";
     }, 600);
   } catch (error) {
     console.error("Google sign-in error:", error);

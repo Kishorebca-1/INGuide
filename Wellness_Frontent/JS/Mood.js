@@ -792,7 +792,7 @@ function renderProgress() {
    SAVE MOOD CHECK-IN
 ========================================= */
 
-function saveCheckinData() {
+async function saveCheckinData() {
 
     const checkins =
         getArray(moodStorageKey);
@@ -858,6 +858,15 @@ function saveCheckinData() {
         checkinNotesStorageKey,
         JSON.stringify(storedNotes.slice(0, maxEntries))
     );
+
+    try {
+        await wellnessApiRequest("/mood", {
+            method: "POST",
+            body: JSON.stringify(entry)
+        });
+    } catch (error) {
+        console.warn("Mood check-in saved locally but not synced:", error.message);
+    }
 
 
     renderMoodTrend();
@@ -1092,7 +1101,7 @@ function escapeHtml(text) {
 
 saveJournal.addEventListener(
     "click",
-    () => {
+    async () => {
 
         const text =
             journalText.innerText.trim();
@@ -1148,6 +1157,19 @@ saveJournal.addEventListener(
                 )
             )
         );
+
+        try {
+            await wellnessApiRequest("/journal", {
+                method: "POST",
+                body: JSON.stringify({
+                    content: text,
+                    mood: selectedMood,
+                    sleep: selectedSleep
+                })
+            });
+        } catch (error) {
+            console.warn("Journal entry saved locally but not synced:", error.message);
+        }
 
 
         journalText.innerHTML = "";
@@ -1344,7 +1366,7 @@ document
     .addEventListener("click", () => {
 
         window.location.href =
-            "dashboard.html";
+            "../Dashboard/dashboard.html";
 
     });
 
@@ -1543,6 +1565,49 @@ trendRange.addEventListener(
    INITIALIZE PAGE
 ========================================= */
 
+async function syncRemoteMoodAndJournal() {
+    if (!localStorage.getItem("token")) {
+        return;
+    }
+
+    try {
+        const [moodResponse, journalResponse] = await Promise.all([
+            wellnessApiRequest("/mood/history"),
+            wellnessApiRequest("/journal")
+        ]);
+
+        const remoteMoods = (moodResponse || []).map(entry => ({
+            date: entry.date || entry.created_at?.slice(0, 10),
+            mood: entry.mood,
+            sleep: entry.sleep || "Good",
+            note: entry.note || ""
+        })).filter(entry => entry.date && entry.mood);
+
+        const remoteJournals = (journalResponse || []).map(entry => ({
+            date: new Date(entry.created_at || entry.createdAt).toLocaleDateString(
+                "en-US",
+                { year: "numeric", month: "long", day: "numeric" }
+            ),
+            createdAt: entry.created_at || entry.createdAt,
+            text: entry.content || entry.text || "",
+            mood: entry.mood || "Good",
+            sleep: entry.sleep || "Good"
+        })).filter(entry => entry.text);
+
+        localStorage.setItem(moodStorageKey, JSON.stringify(remoteMoods.slice(0, maxCheckins)));
+        localStorage.setItem(journalStorageKey, JSON.stringify(remoteJournals.slice(0, maxEntries)));
+        localStorage.removeItem(checkinNotesStorageKey);
+
+        loadTodayCheckin();
+        renderMoodTrend();
+        renderProgress();
+        renderJournalEntries();
+        renderSavedNotes();
+    } catch (error) {
+        console.warn("Using local Mood and Journal data:", error.message);
+    }
+}
+
 updatePriority();
 
 loadTodayCheckin();
@@ -1552,3 +1617,5 @@ renderMoodTrend();
 renderProgress();
 
 renderSavedNotes();
+
+syncRemoteMoodAndJournal();

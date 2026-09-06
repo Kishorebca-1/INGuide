@@ -1,0 +1,9 @@
+{
+  "name": "student-wellness-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix Wellness_Backend start",
+    "dev": "npm --prefix Wellness_Backend run dev"
+  }
+}

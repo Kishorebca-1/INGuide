@@ -1063,7 +1063,7 @@ function setupSubmitRequest() {
 
     submitButton.addEventListener(
         "click",
-        function () {
+        async function () {
 
             const professional =
                 JSON.parse(
@@ -1122,6 +1122,31 @@ function setupSubmitRequest() {
                 "latestSupportRequest",
                 JSON.stringify(supportRequest)
             );
+
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.textContent = "Submitting...";
+
+            try {
+                const savedRequest = await wellnessApiRequest("/support/requests", {
+                    method: "POST",
+                    body: JSON.stringify(supportRequest)
+                });
+
+                localStorage.setItem(
+                    "latestSupportRequest",
+                    JSON.stringify({
+                        ...supportRequest,
+                        requestId: savedRequest.id,
+                        submittedAt: savedRequest.submittedAt
+                    })
+                );
+            } catch (error) {
+                console.warn("Support request saved locally but not synced:", error.message);
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonText;
+            }
 
 
             window.location.href =

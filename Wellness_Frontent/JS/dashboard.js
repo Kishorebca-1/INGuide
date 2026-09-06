@@ -28,6 +28,9 @@ const toast = (message) => {
 
 };
 
+let selectedDashboardMood = "Good";
+let selectedDashboardSleep = "Good";
+
 
 
 /* =====================================================
@@ -72,7 +75,7 @@ document
             ) {
 
                 window.location.href =
-                    "mood-journal.html";
+                    "../Mood & Journal/Mood.html";
 
                 return;
 
@@ -122,6 +125,8 @@ document
 
             button.classList.add("selected");
 
+            selectedDashboardSleep = button.dataset.value;
+
 
             /*
                 Show message
@@ -166,6 +171,14 @@ document
 
             button.style.transform =
                 "scale(1.25)";
+
+            selectedDashboardMood = {
+                "😟": "Stressed",
+                "🙁": "Low",
+                "😐": "Okay",
+                "🙂": "Good",
+                "😄": "Great"
+            }[button.textContent.trim()] || "Good";
 
 
             toast(
@@ -260,7 +273,7 @@ document
     .getElementById("sleepCheckin")
     .addEventListener("click", () => {
 
-        window.location.href = "mood-journal.html";
+        window.location.href = "../Mood & Journal/Mood.html";
 
     });
 
@@ -272,12 +285,22 @@ document
 
 document
     .getElementById("updateMood")
-    .addEventListener("click", () => {
+    .addEventListener("click", async () => {
+        try {
+            await wellnessApiRequest("/mood", {
+                method: "POST",
+                body: JSON.stringify({
+                    mood: selectedDashboardMood,
+                    sleep: selectedDashboardSleep,
+                    note: ""
+                })
+            });
 
-        toast(
-            "Your mood has been updated"
-        );
-
+            toast("Your mood has been updated");
+        } catch (error) {
+            toast("Mood saved locally. Sign in or try again to sync.");
+            console.warn("Dashboard mood sync failed:", error.message);
+        }
     });
 
 
@@ -2622,7 +2645,7 @@ if (cancelPriority) {
 
 if (savePriorities) {
 
-    savePriorities.addEventListener("click", () => {
+    savePriorities.addEventListener("click", async () => {
 
         const priorityItems =
             document.querySelectorAll(
@@ -2712,6 +2735,34 @@ if (savePriorities) {
                 priorityName
             );
 
+            try {
+                const availablePriorities =
+                    await wellnessApiRequest("/priorities");
+
+                const priorityIds = [...document.querySelectorAll(
+                    ".priority-check:checked"
+                )]
+                    .map(input => availablePriorities.find(
+                        priority => priority.name === input.value
+                    )?.id)
+                    .filter(Boolean);
+
+                const topPriorityId = availablePriorities.find(
+                    priority => priority.name === priorityName
+                )?.id;
+
+                if (!priorityIds.length || !topPriorityId) {
+                    throw new Error("Selected priorities are not available in the backend");
+                }
+
+                await wellnessApiRequest("/priorities", {
+                    method: "POST",
+                    body: JSON.stringify({ priorityIds, topPriorityId })
+                });
+            } catch (error) {
+                console.warn("Dashboard priorities saved locally but not synced:", error.message);
+            }
+
 
             /* Change top card immediately */
 
@@ -2739,6 +2790,9 @@ if (savePriorities) {
 
         closePriorityWindow();
 
+        window.location.href =
+            "../Mood & Journal/Mood.html";
+
     });
 
 }
@@ -2748,7 +2802,39 @@ if (savePriorities) {
    LOAD TOP PRIORITY WHEN PAGE OPENS
 ===================================================== */
 
+async function syncDashboardData() {
+    if (!localStorage.getItem("token")) {
+        return;
+    }
+
+    try {
+        const [dashboardData, priorities] = await Promise.all([
+            wellnessApiRequest("/dashboard"),
+            wellnessApiRequest("/priorities/my-priorities")
+        ]);
+
+        if (dashboardData?.user?.name) {
+            const userName = document.getElementById("userName");
+            if (userName) userName.textContent = `${dashboardData.user.name}!`;
+        }
+
+        const topPriority = (priorities || []).find(
+            priority => priority.is_top_priority
+        );
+
+        if (topPriority?.name) {
+            localStorage.setItem("wellnessTopPriority", topPriority.name);
+            if (priorityData[topPriority.name]) {
+                updateTopPriority(topPriority.name);
+            }
+        }
+    } catch (error) {
+        console.warn("Using local Dashboard data:", error.message);
+    }
+}
+
 loadTopPriority();
+syncDashboardData();
 
 
 
@@ -3520,6 +3606,6 @@ document
 
         if (!emojiButton) return;
 
-        window.location.href = "mood-journal.html";
+        window.location.href = "../Mood & Journal/Mood.html";
 
     });
