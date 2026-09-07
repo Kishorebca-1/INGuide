@@ -1372,8 +1372,8 @@ document
 
 
 document
-    .querySelector(".notification-button")
-    .addEventListener("click", () => {
+    .getElementById("notificationBtn")
+    ?.addEventListener("click", () => {
 
         showToast(
             "You have 3 new notifications."
@@ -1383,8 +1383,8 @@ document
 
 
 document
-    .querySelector(".profile-button")
-    .addEventListener("click", () => {
+    .getElementById("profileBtn")
+    ?.addEventListener("click", () => {
 
         showToast(
             "Profile menu"

@@ -1,4 +1,18 @@
 (function setupWellnessNavigation() {
+    if (!document.querySelector('link[data-global-navigation-style]')) {
+        const stylesheet = document.createElement("link");
+        stylesheet.rel = "stylesheet";
+        stylesheet.href = "../CSS/global-navigation.css";
+        stylesheet.dataset.globalNavigationStyle = "true";
+        document.head.appendChild(stylesheet);
+    }
+
+    if (!document.querySelector('script[src$="global-navigation.js"]')) {
+        const globalNavigationScript = document.createElement("script");
+        globalNavigationScript.src = "../JS/global-navigation.js";
+        document.body.appendChild(globalNavigationScript);
+    }
+
     const pageRoutes = {
         Dashboard: "../Dashboard/dashboard.html",
         "Mood, Journal & Progress": "../Mood & Journal/Mood.html",
