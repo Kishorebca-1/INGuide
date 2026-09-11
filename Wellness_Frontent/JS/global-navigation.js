@@ -1,11 +1,13 @@
 (function initializeGlobalNavigation() {
     const currentPath = decodeURIComponent(window.location.pathname).toLowerCase();
     const isDashboard = currentPath.includes("/dashboard/dashboard");
+    const isSupportPage = currentPath.includes("/support/");
     const user = JSON.parse(localStorage.getItem("user") || "null");
     const displayName = user?.name || user?.fullName || "Kishore";
 
     if (!isDashboard && !document.querySelector(".global-navigation-sidebar")) {
         document.body.classList.add("has-global-navigation");
+        document.body.classList.toggle("support-page", isSupportPage);
         const existingSidebar = document.querySelector("aside.sidebar");
         const existingHeader = document.querySelector("main > header");
         const heading = existingHeader?.querySelector("h1")?.textContent.trim() || "Wellness";
@@ -16,7 +18,7 @@
         existingSidebar?.remove();
         existingHeader?.remove();
 
-        document.body.insertAdjacentHTML("afterbegin", createGlobalSidebar());
+        document.body.insertAdjacentHTML("afterbegin", createGlobalSidebar(isSupportPage));
 
         const main = document.querySelector("main");
         if (main) {
@@ -39,7 +41,7 @@
     setupGlobalNavigationActions();
 })();
 
-function createGlobalSidebar() {
+function createGlobalSidebar(isSupportPage = false) {
     return `
         <aside class="global-navigation-sidebar">
             <div class="brand">
@@ -47,12 +49,12 @@ function createGlobalSidebar() {
                 <div><h2>Wellness</h2><p>Better mind, better you</p></div>
             </div>
             <nav class="side-nav" aria-label="Primary navigation">
-                <button class="nav-item" data-page="Dashboard"><span class="nav-icon">⌂</span><span>Dashboard</span></button>
-                <button class="nav-item" data-page="Mood, Journal & Progress"><span class="nav-icon">▤</span><span>Mood, Journal &<br>Progress</span></button>
-                <button class="nav-item" data-page="Relax & Activities"><span class="nav-icon">♧</span><span>Relax & Activities</span></button>
-                <button class="nav-item" data-page="Support & Guidance"><span class="nav-icon">♡</span><span>Support & Guidance</span></button>
-                <button class="nav-item" data-page="Wellness Resources"><span class="nav-icon">▣</span><span>Wellness Resources</span></button>
-                <button class="nav-item" data-page="Reminders, Habits & Profile"><span class="nav-icon">♙</span><span>Reminders, Habits<br>& Profile</span></button>
+                <button class="nav-item" data-page="Dashboard"><span class="nav-icon">⌂</span><span>${isSupportPage ? "Home" : "Dashboard"}</span></button>
+                <button class="nav-item" data-page="Mood, Journal & Progress"><span class="nav-icon">▤</span><span>${isSupportPage ? "Check In" : "Mood, Journal &<br>Progress"}</span></button>
+                <button class="nav-item" data-page="Relax & Activities"><span class="nav-icon">♧</span><span>${isSupportPage ? "Explore" : "Relax & Activities"}</span></button>
+                <button class="nav-item" data-page="Support & Guidance"><span class="nav-icon">♡</span><span>${isSupportPage ? "Support" : "Support & Guidance"}</span></button>
+                <button class="nav-item" data-page="Wellness Resources"><span class="nav-icon">▣</span><span>${isSupportPage ? "Resources" : "Wellness Resources"}</span></button>
+                <button class="nav-item" data-page="Reminders, Habits & Profile"><span class="nav-icon">♙</span><span>${isSupportPage ? "My Wellness" : "Reminders, Habits<br>& Profile"}</span></button>
             </nav>
             <div class="sidebar-spacer"></div>
             <div class="motivation-card"><div class="motivation-text">You're one<br>step closer to<br>a better you.</div><div class="mountains">⌁<br>◢▲◣</div><div class="sun"></div></div>
@@ -108,8 +110,14 @@ function setupGlobalNavigationActions() {
     const notificationDropdown = document.getElementById("notificationDropdown");
     const profileButton = document.getElementById("profileBtn");
     const profileDropdown = document.getElementById("profileDropdown");
+    const chatButton = document.getElementById("chatBtn");
     notificationButton?.addEventListener("click", event => { event.stopPropagation(); notificationDropdown?.classList.toggle("show"); profileDropdown?.classList.remove("show"); });
     profileButton?.addEventListener("click", event => { event.stopPropagation(); profileDropdown?.classList.toggle("show"); notificationDropdown?.classList.remove("show"); });
+    chatButton?.addEventListener("click", () => {
+        window.location.href = currentPath.includes("/support/")
+            ? "chatbot.html"
+            : "../Support/chatbot.html";
+    });
     document.addEventListener("click", () => { notificationDropdown?.classList.remove("show"); profileDropdown?.classList.remove("show"); });
     document.getElementById("logoutBtn")?.addEventListener("click", () => { localStorage.removeItem("user"); localStorage.removeItem("token"); window.location.href = "../Authentication/Login.html"; });
 }

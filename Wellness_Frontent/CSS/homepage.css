@@ -20,6 +20,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -1257,6 +1258,38 @@ h1 {
   }
   .path-preview {
     grid-template-columns: 1fr;
+  }
+
+  .bouquet-stage {
+    width: min(100%, 520px);
+  }
+
+  .board[data-pos="1"] {
+    left: 17%;
+  }
+
+  .board[data-pos="2"] {
+    top: 96%;
+  }
+
+  .board[data-pos="3"] {
+    left: 83%;
+  }
+
+  .board[data-pos="4"] {
+    left: 80%;
+  }
+
+  .board[data-pos="5"] {
+    left: 20%;
+  }
+
+  .board[data-pos="7"] {
+    left: 17%;
+  }
+
+  .board[data-pos="8"] {
+    left: 20%;
   }
 }
 

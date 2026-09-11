@@ -702,4 +702,3 @@ if (resetPasswordForm && resetPasswordInput && resetPasswordConfirm) {
     });
   }
 }
-next;
